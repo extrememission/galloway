@@ -13,14 +13,14 @@
             height: 100vh;
             margin: 0;
             background: linear-gradient(45deg, #3498db, #8e44ad);
+            text-align: center;
+            color: white;
         }
         .container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 10px;
             padding: 2rem;
-            text-align: center;
-            color: white;
         }
         button {
             background: rgba(255, 255, 255, 0.2);
@@ -44,20 +44,40 @@
 </head>
 <body>
     <div class="container">
+        <div id="audioStatus">Audio Not Enabled</div>
+        <button id="enableAudioBtn">Enable Audio</button>
         <div id="timer">00:00</div>
-        <button id="startBtn">Start</button>
-        <button id="stopBtn">Stop</button>
+        <button id="startBtn" disabled>Start</button>
+        <button id="stopBtn" disabled>Stop</button>
     </div>
+
     <script>
-        let timer;
-        let isRunning = false;
-        let seconds = 0;
+        const enableAudioBtn = document.getElementById('enableAudioBtn');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const timerDisplay = document.getElementById('timer');
+        const audioStatus = document.getElementById('audioStatus');
 
-        const alertSound1 = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
-        const alertSound2 = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-classic-alarm-995.mp3');
+        // Create audio objects
+        const alertSound1 = new Audio('https://www.soundjay.com/button/beep-07.mp3');
+        const alertSound2 = new Audio('https://www.soundjay.com/button/sounds/button-09.mp3');
+
+        let timer;
+        let isRunning = false;
+        let seconds = 0;
+
+        enableAudioBtn.addEventListener('click', () => {
+            // Play a short sound to enable audio
+            alertSound1.play().then(() => {
+                enableAudioBtn.style.display = 'none';
+                startBtn.disabled = false;
+                stopBtn.disabled = false;
+                audioStatus.textContent = 'Audio Enabled';
+            }).catch(error => {
+                console.error('Audio enable failed:', error);
+                audioStatus.textContent = 'Audio Enable Failed';
+            });
+        });
 
         startBtn.addEventListener('click', startTimer);
         stopBtn.addEventListener('click', stopTimer);
@@ -80,9 +100,9 @@
             seconds++;
             updateDisplay();
             if (seconds % 120 === 90) {
-                playAlert(alertSound1);
+                alertSound1.play();
             } else if (seconds % 120 === 0) {
-                playAlert(alertSound2);
+                alertSound2.play();
             }
         }
 
@@ -95,19 +115,6 @@
         function padZero(num) {
             return num.toString().padStart(2, '0');
         }
-
-        function playAlert(sound) {
-            sound.play();
-        }
-
-        // Enable background audio
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                navigator.serviceWorker.register('sw.js').then(registration => {
-                    registration.active.postMessage({type: 'KEEP_ALIVE'});
-                });
-            }
-        });
     </script>
 </body>
 </html>
