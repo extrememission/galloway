@@ -44,19 +44,15 @@
 </head>
 <body>
     <div class="container">
-        <div id="audioStatus">Audio Not Enabled</div>
-        <button id="enableAudioBtn">Enable Audio</button>
         <div id="timer">00:00</div>
-        <button id="startBtn" disabled>Start</button>
+        <button id="startBtn">Start</button>
         <button id="stopBtn" disabled>Stop</button>
     </div>
 
     <script>
-        const enableAudioBtn = document.getElementById('enableAudioBtn');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const timerDisplay = document.getElementById('timer');
-        const audioStatus = document.getElementById('audioStatus');
 
         // Create audio objects
         const alertSound1 = new Audio('https://www.soundjay.com/button/beep-07.mp3');
@@ -66,26 +62,22 @@
         let isRunning = false;
         let seconds = 0;
 
-        enableAudioBtn.addEventListener('click', () => {
-            // Play a short sound to enable audio
-            alertSound1.play().then(() => {
-                enableAudioBtn.style.display = 'none';
-                startBtn.disabled = false;
-                stopBtn.disabled = false;
-                audioStatus.textContent = 'Audio Enabled';
-            }).catch(error => {
-                console.error('Audio enable failed:', error);
-                audioStatus.textContent = 'Audio Enable Failed';
-            });
-        });
-
         startBtn.addEventListener('click', startTimer);
         stopBtn.addEventListener('click', stopTimer);
 
         function startTimer() {
             if (!isRunning) {
                 isRunning = true;
+
+                // Attempt to play a sound to ensure audio is enabled
+                alertSound1.play().catch(error => {
+                    console.error('Audio playback failed:', error);
+                    alert('Please enable sound in your browser settings.');
+                });
+
                 timer = setInterval(updateTimer, 1000);
+                stopBtn.disabled = false; // Enable Stop button
+                startBtn.disabled = true; // Disable Start button
             }
         }
 
@@ -94,15 +86,18 @@
             clearInterval(timer);
             seconds = 0;
             updateDisplay();
+            stopBtn.disabled = true; // Disable Stop button
+            startBtn.disabled = false; // Enable Start button
         }
 
         function updateTimer() {
             seconds++;
             updateDisplay();
+            
             if (seconds % 120 === 90) {
-                alertSound1.play();
+                alertSound1.play().catch(error => console.error('Failed to play sound:', error));
             } else if (seconds % 120 === 0) {
-                alertSound2.play();
+                alertSound2.play().catch(error => console.error('Failed to play sound:', error));
             }
         }
 
