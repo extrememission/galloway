@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cool Timer App</title>
+    <title>120secs</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,14 +13,14 @@
             height: 100vh;
             margin: 0;
             background: linear-gradient(45deg, #3498db, #8e44ad);
-            text-align: center;
-            color: white;
         }
         .container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 10px;
             padding: 2rem;
+            text-align: center;
+            color: white;
         }
         button {
             background: rgba(255, 255, 255, 0.2);
@@ -46,21 +46,19 @@
     <div class="container">
         <div id="timer">00:00</div>
         <button id="startBtn">Start</button>
-        <button id="stopBtn" disabled>Stop</button>
+        <button id="stopBtn">Stop</button>
     </div>
 
     <script>
+        let timer;
+        let isRunning = false;
+        let seconds = 0;
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const timerDisplay = document.getElementById('timer');
 
-        // Create audio objects
         const alertSound1 = new Audio('https://www.soundjay.com/button/beep-07.mp3');
         const alertSound2 = new Audio('https://www.soundjay.com/button/sounds/button-09.mp3');
-
-        let timer;
-        let isRunning = false;
-        let seconds = 0;
 
         startBtn.addEventListener('click', startTimer);
         stopBtn.addEventListener('click', stopTimer);
@@ -68,16 +66,7 @@
         function startTimer() {
             if (!isRunning) {
                 isRunning = true;
-
-                // Attempt to play a sound to ensure audio is enabled
-                alertSound1.play().catch(error => {
-                    console.error('Audio playback failed:', error);
-                    alert('Please enable sound in your browser settings.');
-                });
-
                 timer = setInterval(updateTimer, 1000);
-                stopBtn.disabled = false; // Enable Stop button
-                startBtn.disabled = true; // Disable Start button
             }
         }
 
@@ -86,18 +75,15 @@
             clearInterval(timer);
             seconds = 0;
             updateDisplay();
-            stopBtn.disabled = true; // Disable Stop button
-            startBtn.disabled = false; // Enable Start button
         }
 
         function updateTimer() {
             seconds++;
             updateDisplay();
-            
             if (seconds % 120 === 90) {
-                alertSound1.play().catch(error => console.error('Failed to play sound:', error));
+                alertSound1.play();
             } else if (seconds % 120 === 0) {
-                alertSound2.play().catch(error => console.error('Failed to play sound:', error));
+                alertSound2.play();
             }
         }
 
